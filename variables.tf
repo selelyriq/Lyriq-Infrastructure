@@ -7,6 +7,12 @@
 #   default = "172.128.0.0/16"
 # }
 
+variable "elastic_ip" {
+  # description = ""
+  type        = string
+  default = "eipalloc-0ced25fe98d61a673"
+}
+
 variable "Public_subnet" {
   type = string
   default = "172.31.128.0/20"
