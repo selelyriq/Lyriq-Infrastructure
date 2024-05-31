@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "-----BEGIN RSA PRIVATE KEY-----
+YOUR_PRIVATE_KEY_CONTENT_HERE
+-----END RSA PRIVATE KEY-----" > /Users/lyriqsele/Documents/Code/SSH-Keys/My_Keypair.pem
+chmod 600 /home/ubuntu/.ssh/My_Keypair.pem

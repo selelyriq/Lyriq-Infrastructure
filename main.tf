@@ -55,11 +55,14 @@ resource "aws_instance" "Jumphost" {
   subnet_id = aws_subnet.Public_subnet.id
   key_name = "My_Keypair"
   security_groups = [aws_security_group.Allow_Jumphost_SSH.id]
+  user_data = file("/Users/lyriqsele/Documents/Code/My_Infrastructure/ssh_script")
   
   tags = {
     Name = "Jumphost"
   }
 }
+
+
 
 # resource "aws_security_group" "Allow_Jumphost_SSH" {
 #   name = "Allow_Jumphost"
@@ -76,7 +79,7 @@ resource "aws_instance" "Jumphost" {
 #   security_group_id = aws_security_group.Allow_Jumphost_SSH.id  # Ensure this points to the correct security group ID
 #   from_port         = 22
 #   to_port           = 22
-#   cidr_blocks      = ["18.206.107.24/29"]  # Specify the correct IP address range
+#   cidr_ipv4 = var.cidr_blocks# Specify the correct IP address range
 # }
 
 
@@ -101,12 +104,18 @@ resource "aws_instance" "Infrastructure" {
   instance_type = "t2.micro"
   subnet_id = aws_subnet.Public_subnet.id
   key_name = "My_Keypair"
+  security_groups = [aws_security_group.Jumphost_to_Monitoring.id]
 
 
   tags = {
     Name = "Monitoring Containers"
   }
 }
+
+# resource "tls_private_key" "Infrastructure_keypair" {
+#   key_name   = var.key_name
+#   public_key = tls_private_key
+# }
 
 resource "aws_security_group" "Jumphost_to_Monitoring" {
   name        = "Allow_Jumphost_to_monitoring"
