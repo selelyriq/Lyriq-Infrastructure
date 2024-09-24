@@ -1,0 +1,8 @@
+- hosts: web
+  tasks:
+    - name: Install Nginx
+      apt: name=nginx state=latest
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started 

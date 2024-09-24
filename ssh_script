@@ -1,5 +1,28 @@
 #!/bin/bash
-echo "-----BEGIN RSA PRIVATE KEY-----
-YOUR_PRIVATE_KEY_CONTENT_HERE
------END RSA PRIVATE KEY-----" > /Users/lyriqsele/Documents/Code/SSH-Keys/My_Keypair.pem
-chmod 600 /home/ubuntu/.ssh/My_Keypair.pem
+
+# Variables
+LOCAL_KEY_PATH="/Users/lyriqsele/Documents/Code/SSH-Keys/My_Keypair.pem"
+JUMPHOST_USER="ubuntu"
+JUMPHOST_IP="35.173.169.108"
+REMOTE_KEY_PATH="/home/ubuntu/.ssh/My_Keypair.pem"
+LOCAL_KEY_FOR_JUMPHOST="/Users/lyriqsele/Documents/Code/SSH-Keys/My_Keypair.pem"
+
+# Copy Private SSH key from local machine to JumpHost Server
+scp "$LOCAL_KEY_PATH" "$JUMPHOST_USER@$JUMPHOST_IP:$REMOTE_KEY_PATH"
+
+# Check to see if SSH Key was properly transferred 
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to transfer the key to the jump host."
+    exit 1
+fi
+
+# Change permissions on SSH key
+ssh -i "$LOCAL_KEY_FOR_JUMPHOST" "$JUMPHOST_USER@$JUMPHOST_IP" "chmod 600 $REMOTE_KEY_PATH"
+
+# Check to see if SSH Key has proper permissions
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to set permissions on the key file on the jump host."
+    exit 1
+fi
+
+echo "SSH key successfully transferred and permissions set."
