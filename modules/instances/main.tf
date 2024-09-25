@@ -8,7 +8,7 @@ resource "aws_instance" "BuildHost" {
 
 
   tags = {
-    Name = "Monitoring Containers"
+    Name = "Build Host"
   }
 }
 
@@ -24,7 +24,15 @@ resource "aws_instance" "Monitoring" {
   }
 }
 
-resource "aws_eip_association" "eip_assoc" {
-  instance_id   = aws_instance.BuildHost.id
-  allocation_id = var.elastic_ip
+output "build_instance_id" {
+  value = aws_instance.BuildHost.id
 }
+
+output "monitoring_instance_id" {
+  value = aws_instance.Monitoring.id
+}
+
+# resource "aws_eip_association" "eip_assoc" {
+#   instance_id   = aws_instance.BuildHost.id
+#   allocation_id = var.elastic_ip
+# }

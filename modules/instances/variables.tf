@@ -42,3 +42,6 @@ variable "security_group_cidr_blocks" {
   type = string
 }
 
+variable "allocation_id" {
+  type = string
+}

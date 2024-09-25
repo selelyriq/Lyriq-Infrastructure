@@ -1,5 +1,5 @@
 resource "aws_security_group" "Jumphost_to_Monitoring" {
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.main.id
   name        = "Allow_Jumphost_to_monitoring"
   description = "Allow SSH access from Jumphost to monitoring server"
 

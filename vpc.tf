@@ -1,12 +1,17 @@
-resource "aws_vpc" "vpc" {
-
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr_blocks
+  instance_tenancy     = "default"
   enable_dns_hostnames = true
   enable_dns_support   = true
+
+  tags = {
+    Name = "main"
+  }
 }
 
 resource "aws_subnet" "Public_subnet" {
   # count = length(var.Public_subnet)
-  vpc_id            = data.aws_vpc.default.id
+  vpc_id            = aws_vpc.main.id
   cidr_block        = var.Public_subnet
   availability_zone = "us-east-1a"
 
@@ -20,7 +25,7 @@ resource "aws_subnet" "Public_subnet" {
 
 resource "aws_subnet" "Private_subnet" {
   # count = length(var.Private_subnet)
-  vpc_id            = data.aws_vpc.default.id
+  vpc_id            = aws_vpc.main.id
   cidr_block        = var.Private_subnet
   availability_zone = "us-east-1a"
 
@@ -29,31 +34,28 @@ resource "aws_subnet" "Private_subnet" {
   }
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
+# data "aws_vpc" "default" {
+#   id = aws_vpc.main.id
+# }
 
 output "vpc_id" {
-  value = data.aws_vpc.default
+  value = aws_vpc.main.id
 }
 
 locals {
   mtc_igw_id = "mtc_igw-5369"
 }
 
-data "aws_internet_gateway" "default" {
-  filter {
-    name   = "attachment.vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
+resource "aws_internet_gateway" "default" {
+  vpc_id = aws_vpc.main.id
 }
 
 resource "aws_route_table" "route_table" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.main.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = data.aws_internet_gateway.default.id
+    gateway_id = aws_internet_gateway.default.id
   }
 
   tags = {

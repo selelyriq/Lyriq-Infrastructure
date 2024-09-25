@@ -21,15 +21,6 @@ locals {
   setup_name = "my_infrastructure"
 }
 
-locals {
-  region = ["us-east-1", "us-west-1"]
-}
-
-provider "aws" {
-  region = "us-east-1" // Replace with your AWS region
-  // You can also configure AWS credentials here if needed
-}
-
 module "instances" {
   source                      = "./modules/instances"
   ami                         = "ami-06b08f0bf3eaf34a9"
@@ -43,6 +34,11 @@ module "instances" {
   from_port                   = 22
   to_port                     = 22
   protocol                    = "tcp"
+  allocation_id = aws_eip.elastic_ip.id
+}
+
+resource "aws_eip" "elastic_ip" {
+  instance = module.instances.build_instance_id
 }
 
 module "buckets" {
