@@ -15,7 +15,7 @@ output "bucket_arn" {
 }
 
 resource "aws_s3_bucket_versioning" "default" {
-  bucket = aws_s3_bucket.default
+  bucket = aws_s3_bucket.default.id
   versioning_configuration {
     status = "Enabled"
   }
