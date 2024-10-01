@@ -34,7 +34,7 @@ module "instances" {
   from_port                   = 22
   to_port                     = 22
   protocol                    = "tcp"
-  allocation_id = aws_eip.elastic_ip.id
+  allocation_id               = aws_eip.elastic_ip.id
 }
 
 resource "aws_eip" "elastic_ip" {
@@ -44,4 +44,29 @@ resource "aws_eip" "elastic_ip" {
 module "buckets" {
   source      = "./modules/buckets"
   bucket_name = "my_bucket"
+}
+
+resource "aws_sqs_queue" "scaling_queue" {
+  name = "scaling_queue"
+}
+
+resource "aws_autoscaling_notification" "scaling_notification" {
+  group_names = [aws_autoscaling_group.webserver.name]
+  notifications = [
+    "autoscaling:EC2_INSTANCE_LAUNCHING",
+    "autoscaling:EC2_INSTANCE_TERMINATING",
+  ]
+  topic_arn = aws_sns_topic.scaling_topic.arn
+}
+
+output "scaling_topic_arn" {
+  value = aws_sns_topic.scaling_topic.arn
+}
+
+resource "aws_sns_topic" "scaling_topic" {
+  name = "scaling_topic"
+}
+
+output "scaling_queue_arn" {
+  value = aws_sqs_queue.scaling_queue.arn
 }

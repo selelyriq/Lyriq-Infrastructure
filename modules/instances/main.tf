@@ -12,6 +12,19 @@ resource "aws_instance" "BuildHost" {
   }
 }
 
+resource "aws_instance" "Webserver" {
+  ami                         = var.ami
+  instance_type               = var.instance_type
+  subnet_id                   = var.subnet_id
+  key_name                    = var.key_name
+  security_groups             = [var.security_group]
+  associate_public_ip_address = var.associate_public_ip_address
+
+  tags = {
+    Name = "Webserver"
+  }
+}
+
 resource "aws_instance" "Monitoring" {
   ami             = var.ami
   instance_type   = var.instance_type
