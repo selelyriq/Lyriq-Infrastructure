@@ -37,13 +37,33 @@ module "instances" {
   allocation_id               = aws_eip.elastic_ip.id
 }
 
+module "autoscaling" {
+  source             = "./resources/autoscaling"
+  public_subnet_id   = aws_subnet.Public_subnet.id
+  private_subnet_id  = aws_subnet.Private_subnet.id
+  scaling_queue_arn  = aws_sqs_queue.scaling_queue.arn
+  iam_role_arn       = aws_iam_role.autoscaling_role.arn
+}
+
 resource "aws_eip" "elastic_ip" {
   instance = module.instances.build_instance_id
 }
 
-module "buckets" {
-  source      = "./modules/buckets"
-  bucket_name = "my_bucket"
+resource "aws_iam_role" "autoscaling_role" {
+  name = "autoscaling_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "autoscaling.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_sqs_queue" "scaling_queue" {
@@ -51,7 +71,7 @@ resource "aws_sqs_queue" "scaling_queue" {
 }
 
 resource "aws_autoscaling_notification" "scaling_notification" {
-  group_names = [aws_autoscaling_group.webserver.name]
+  group_names = [module.autoscaling.autoscaling_group_name]
   notifications = [
     "autoscaling:EC2_INSTANCE_LAUNCHING",
     "autoscaling:EC2_INSTANCE_TERMINATING",
